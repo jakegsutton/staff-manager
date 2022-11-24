@@ -1,0 +1,1 @@
+export const APP_ID = "staff-manager-taalo";
