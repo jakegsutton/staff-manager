@@ -63,7 +63,7 @@ const Login = () => {
       // to validate the user credentials and login the user into our App.
       const user = await emailPasswordLogin(form.email, form.password);
       if (user) 
-        redirectNow(user.customData.isManager ? "/manager-home" : "staff-home");
+        redirectNow(user.customData.isManager ? "/manager-home" : "/staff-home");
     } catch (error) {
       alert("The email or password is incorrect.");
     }
