@@ -1,16 +1,14 @@
 
 import { Button, TextField } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/user.context";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
+import { TopBanner } from "../components/TopBanner.component";
 import Typography from "@mui/material/Typography";
 
 const Login = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
   // We are consuming our user-management context to 
   // get & set the user details here
@@ -31,9 +29,8 @@ const Login = () => {
 
   // This function will redirect the user to the 
   // appropriate page once the authentication is done.
-  const redirectNow = () => {
-    const redirectTo = location.search.replace("?redirectTo=", "");
-    navigate(redirectTo ? redirectTo : "/");
+  const redirectNow = (route) => {
+    navigate(route);
   }
 
   // Since there can be chances that the user is already logged in
@@ -65,25 +62,16 @@ const Login = () => {
       // function that we imported from our realm/authentication.js
       // to validate the user credentials and login the user into our App.
       const user = await emailPasswordLogin(form.email, form.password);
-      if (user) {
-        redirectNow();
-      }
+      if (user) 
+        redirectNow(user.customData.isManager ? "/manager-home" : "staff-home");
     } catch (error) {
-      alert(error)
+      alert("The email or password is incorrect.");
     }
   };
 
   return (
     <div>
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
-            <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Staff Manager
-                </Typography>
-            </Toolbar>
-            </AppBar>
-        </Box>
+        <TopBanner/>
         <form style={{ display: "flex", flexDirection: "column", maxWidth: "300px", margin: "auto" }}>
             <h1>            
                 <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
@@ -91,27 +79,27 @@ const Login = () => {
                 </Typography>
             </h1>
             <TextField
-            label="Email"
-            type="email"
-            variant="outlined"
-            name="email"
-            value={form.email}
-            onChange={onFormInputChange}
-            style={{ marginBottom: "1rem" }}
+              label="Email"
+              type="email"
+              variant="outlined"
+              name="email"
+              value={form.email}
+              onChange={onFormInputChange}
+              style={{ marginBottom: "1rem" }}
             />
             <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            name="password"
-            value={form.password}
-            onChange={onFormInputChange}
-            style={{ marginBottom: "1rem" }}
+              label="Password"
+              type="password"
+              variant="outlined"
+              name="password"
+              value={form.password}
+              onChange={onFormInputChange}
+              style={{ marginBottom: "1rem" }}
             />
             <Button variant="contained" color="primary" onClick={onSubmit}>
-            Login
+              Login
             </Button>
-            <p>Don't have an account? <Link to="/signup">Signup</Link></p>
+            <p>Don't have an account? <Link to="/choose-account-type">Signup</Link></p>
         </form>
     </div>
   )

@@ -1,9 +1,9 @@
-
 import { Button } from '@mui/material'
 import { useContext } from 'react';
 import { UserContext } from '../contexts/user.context';
+import { TopBanner } from "../components/TopBanner.component";
 
-export default function Home() {
+export default function ManagerHome() {
   const { logOutUser } = useContext(UserContext);
 
   // This function is called when the user clicks the "Logout" button.
@@ -23,8 +23,9 @@ export default function Home() {
 
   return (
     <>
-      <h1>Welcome to Staff Manager</h1>
-      <Button variant="contained" onClick={logOut}>Logout</Button>
+        <TopBanner/>
+        <h1>Manager Home Page</h1>
+        <Button variant="contained" onClick={logOut}>Logout</Button>
     </>
   )
 }
