@@ -12,6 +12,7 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [teamID, setTeamID] = useState(null);
 
   // Function to login user into our Realm using their email & password
   const emailPasswordLogin = async (email, password) => {
@@ -60,7 +61,7 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  return <UserContext.Provider value={{ user, setUser, fetchUser, emailPasswordLogin, emailPasswordSignup, logOutUser }}>
+  return <UserContext.Provider value={{ user, setUser, teamID, setTeamID, fetchUser, emailPasswordLogin, emailPasswordSignup, logOutUser }}>
     {children}
   </UserContext.Provider>;
 }

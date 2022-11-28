@@ -7,22 +7,20 @@ import Typography from "@mui/material/Typography";
 import { DataGrid } from '@mui/x-data-grid';
 import Stack from '@mui/material/Stack';
 
-export default function ManagerHome() {
-  const { logOutUser, user, setTeamID } = useContext(UserContext);
+export default function CreateTeam() {
+  const { logOutUser, teamID, user } = useContext(UserContext);
+  const [teamName, setTeamName] = useState("");
   const navigate = useNavigate();
-  const [teams, setTeams] = useState({});
 
   useEffect(() => {
-    const getTeams = async () => {
+    const getTeam = async () => {
       const client = user.mongoClient("mongodb-atlas");
       const collection = client.db("user_data").collection("teams");
-      const teams = await collection.find({"companyID" : +user.customData.companyID.$numberInt});
-      setTeams(teams.map((team, index) => {    
-        return (({_id, name, description}) => ({id: index+1, _id, name, description}))(team);
-      }));
+      const team = await collection.find({"_id" : teamID});
+      setTeamName(team[0].name);
     }
-    getTeams();
-  }, [user]);
+    getTeam();
+  }, [teamID, user]);
 
   const logOut = async () => {
     try {
@@ -35,43 +33,47 @@ export default function ManagerHome() {
     }
   }
 
-  const createTeam = () => {
-    navigate("/create-team");
-  }
-
-  const rowClickEvent = (params) => {
-    setTeamID(params.row._id);
-    navigate('/team')
+  const back = () => {
+    navigate("/manager-home");
   }
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Team Name", width: 200},
-    { field: "description", headerName: "Description", width: 5000}
+    { field: "userName", headerName: "User Name", width: 200},
   ];
 
+  const names = [
+    { id: 1, userName: "Test User 1"}
+  ];
+  
+  //Right now all values are hardcoded
   return (
     <>
-        <TopBanner name = {user.customData.companyName} id = {user.customData.companyID.$numberInt}/>
+        <TopBanner name = {teamName} id = {user.customData.companyID.$numberInt} />
         <h1>
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-            Teams:
+            Tasks Complete: {0}%
+          </Typography>
+        </h1>
+        <h1>
+          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+            Members:
           </Typography>
         </h1>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
-            rows={teams}
+            rows={names}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            onRowClick={rowClickEvent}
+            // onRowClick={rowClickEvent}
           />
         </div>
         <h1>
-          <Stack direction="row" spacing={1}>
-            <Button variant="contained" onClick={createTeam}>Create New Team</Button>
-            <Button variant="contained" onClick={logOut}>Logout</Button>
-          </Stack>
+            <Stack direction="row" spacing={1}>
+                <Button variant="contained" onClick={back}>Back</Button>
+                <Button variant="contained" onClick={logOut}>Logout</Button>
+            </Stack>
         </h1>
     </>
   )

@@ -8,6 +8,8 @@ import PrivateRoute from "./pages/PrivateRoute.page";
 import ManagerSignup  from "./pages/ManagerSignup.page";
 import StaffSignup  from "./pages/StaffSignup.page";
 import Choose from "./pages/ChooseAccountType.page";
+import CreateTeam from "./pages/CreateTeam.page";
+import Team from "./pages/Team.page";
 
 function App() {
   return (
@@ -26,6 +28,12 @@ function App() {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route exact path="/staff-home" element={<StaffHome />} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route exact path="/create-team" element={<CreateTeam />} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route exact path="/team" element={<Team />} />
           </Route>
         </Routes>
       </UserProvider>
