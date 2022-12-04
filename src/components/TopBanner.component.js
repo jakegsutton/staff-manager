@@ -15,7 +15,7 @@ export class TopBanner extends Component {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                       Staff Manager
                     </Typography>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" component="div">
                       {this.props.name} {displayCompanyInfo ? '|' : ''} {this.props.id}
                     </Typography>
                 </Toolbar>

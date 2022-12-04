@@ -1,5 +1,5 @@
 import { Button } from '@mui/material'
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import { UserContext } from '../contexts/user.context';
 import { TopBanner } from "../components/TopBanner.component";
@@ -7,20 +7,46 @@ import Typography from "@mui/material/Typography";
 import { DataGrid } from '@mui/x-data-grid';
 import Stack from '@mui/material/Stack';
 
-export default function CreateTeam() {
-  const { logOutUser, teamID, user } = useContext(UserContext);
+
+export default function Team() {
+  const { logOutUser, teamID, user, setMemberID } = useContext(UserContext);
   const [teamName, setTeamName] = useState("");
+  const [members, setMembers] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [percentTaskComplete, setPercentTaskComplete] = useState((0.0).toFixed(2));
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const getTeam = async () => {
+  const calculatePercentTaskComplete = useCallback(() => {
+    const run = async () => {
       const client = user.mongoClient("mongodb-atlas");
+      const userData = client.db("user_data").collection("user_custom_data");
+      const tasks = client.db("user_data").collection("tasks");
+      const members = await userData.find({"teamID": teamID.toString()});
+      const teamTasks = await tasks.find({"userDataID": { $in: members.map(member => member._id.toString()) }})
+      const completedTasks = await teamTasks.filter(task => task.isComplete);
+      setPercentTaskComplete(teamTasks.length > 0 ? (completedTasks.length * 1.0 / teamTasks.length * 100).toFixed(2) : (0.0).toFixed(2));
+    }
+    run();
+  }, [user, teamID]);
+
+  useEffect(() => {
+    const client = user.mongoClient("mongodb-atlas");
+    const getTeam = async () => {
       const collection = client.db("user_data").collection("teams");
-      const team = await collection.find({"_id" : teamID});
-      setTeamName(team[0].name);
+      const team = await collection.findOne({"_id" : teamID});
+      setTeamName(team.name);
+    }
+    const getMembers = async () => {
+      const collection = client.db("user_data").collection("user_custom_data");
+      const members = await collection.find({"teamID": teamID.toString()});
+      setMembers(members.map((member, index) => {
+        return (({_id, userName})  => ({id: index+1, _id, userName}))(member);
+      }));
     }
     getTeam();
-  }, [teamID, user]);
+    getMembers();
+    calculatePercentTaskComplete();
+  }, [teamID, user, calculatePercentTaskComplete]);
 
   const logOut = async () => {
     try {
@@ -33,6 +59,32 @@ export default function CreateTeam() {
     }
   }
 
+  const removeMembers = async () => {
+    try {
+      if(members.length === 0 || selected.length === 0)
+        alert("There are no members selected.");
+      else {
+        const ids = members.filter(member => selected.includes(member.id)).map(member => member._id);
+        const client = user.mongoClient("mongodb-atlas");
+        const collection = client.db("user_data").collection("user_custom_data");
+        await collection.updateMany({"_id": { $in: ids}}, { $set: { "teamID": "" }})
+        setMembers(members.filter(member => !selected.includes(member.id)))
+        calculatePercentTaskComplete();
+      }
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  const selectionChangeEvent = (params) => {
+    setSelected(params);
+  }
+
+  const rowClickEvent = (params) => {
+    setMemberID(params.row._id)
+    navigate("/member");
+  }
+
   const back = () => {
     navigate("/manager-home");
   }
@@ -42,17 +94,12 @@ export default function CreateTeam() {
     { field: "userName", headerName: "User Name", width: 200},
   ];
 
-  const names = [
-    { id: 1, userName: "Test User 1"}
-  ];
-  
-  //Right now all values are hardcoded
   return (
     <>
         <TopBanner name = {teamName} id = {user.customData.companyID.$numberInt} />
         <h1>
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-            Tasks Complete: {0}%
+            Tasks Completed: {percentTaskComplete}%
           </Typography>
         </h1>
         <h1>
@@ -62,16 +109,19 @@ export default function CreateTeam() {
         </h1>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
-            rows={names}
+            rows={members}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            // onRowClick={rowClickEvent}
+            checkboxSelection
+            onSelectionModelChange={selectionChangeEvent}
+            onRowClick={rowClickEvent}
           />
         </div>
         <h1>
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" onClick={back}>Back</Button>
+                <Button variant="contained" color="error" onClick={removeMembers}>Remove Selected Members</Button>
                 <Button variant="contained" onClick={logOut}>Logout</Button>
             </Stack>
         </h1>

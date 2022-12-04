@@ -10,6 +10,9 @@ import StaffSignup  from "./pages/StaffSignup.page";
 import Choose from "./pages/ChooseAccountType.page";
 import CreateTeam from "./pages/CreateTeam.page";
 import Team from "./pages/Team.page";
+import Member from "./pages/Member.page";
+import CreateTask from "./pages/CreateTask.page";
+
 
 function App() {
   return (
@@ -34,6 +37,12 @@ function App() {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route exact path="/team" element={<Team />} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route exact path="/member" element={<Member />} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route exact path="/create-task" element={<CreateTask />} />
           </Route>
         </Routes>
       </UserProvider>

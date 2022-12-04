@@ -10,7 +10,8 @@ import Stack from '@mui/material/Stack';
 export default function ManagerHome() {
   const { logOutUser, user, setTeamID } = useContext(UserContext);
   const navigate = useNavigate();
-  const [teams, setTeams] = useState({});
+  const [teams, setTeams] = useState([]);
+  const [selected, setSelected] = useState([]);
 
   useEffect(() => {
     const getTeams = async () => {
@@ -35,13 +36,35 @@ export default function ManagerHome() {
     }
   }
 
+  const deleteTeams = async () => {
+    try {
+      if(teams.length === 0 || selected.length === 0)
+        alert("There are no teams selected.");
+      else {
+        const ids = teams.filter(team => selected.includes(team.id)).map(team => team._id);
+        const client = user.mongoClient("mongodb-atlas");
+        const users_collection = client.db("user_data").collection("user_custom_data");
+        const teams_collection = client.db("user_data").collection("teams");
+        await teams_collection.deleteMany({ _id : { $in : ids} });
+        await users_collection.updateMany({"teamID": { $in: ids.map(id => id.toString())}}, { $set: { "teamID": "" }})
+        setTeams(teams.filter(team => !selected.includes(team.id)))
+      }
+    } catch (error) {
+      alert(error);
+    }
+  }
+
   const createTeam = () => {
     navigate("/create-team");
   }
 
+  const selectionChangeEvent = (params) => {
+    setSelected(params);
+  }
+
   const rowClickEvent = (params) => {
     setTeamID(params.row._id);
-    navigate('/team')
+    navigate("/team");
   }
 
   const columns = [
@@ -65,11 +88,14 @@ export default function ManagerHome() {
             pageSize={5}
             rowsPerPageOptions={[5]}
             onRowClick={rowClickEvent}
+            onSelectionModelChange={selectionChangeEvent}
+            checkboxSelection
           />
         </div>
         <h1>
           <Stack direction="row" spacing={1}>
             <Button variant="contained" onClick={createTeam}>Create New Team</Button>
+            <Button variant="contained" color="error" onClick={deleteTeams}>Delete Selected Teams</Button>
             <Button variant="contained" onClick={logOut}>Logout</Button>
           </Stack>
         </h1>

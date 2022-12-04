@@ -42,7 +42,8 @@ const ManagerSignup = () => {
             uniqueID = Math.floor(1000 + Math.random() * 8999);
             result = await collection.findOne({companyID: uniqueID});
           } while(result);
-          collection.insertOne({ userID: user.id, userName: form.userName, companyName: form.companyName, companyID: uniqueID, isManager: true});
+          await collection.insertOne({ userID: user.id, userName: form.userName, companyName: form.companyName, companyID: uniqueID, isManager: true, teamID: ""});
+          await user.refreshCustomData();
           redirectNow();
         }
       }
