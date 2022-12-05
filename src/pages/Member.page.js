@@ -1,5 +1,5 @@
 import { Button } from '@mui/material'
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import { UserContext } from '../contexts/user.context';
 import { TopBanner } from "../components/TopBanner.component";
@@ -30,10 +30,21 @@ export default function Member() {
   const [selected, setSelected] = useState([]);
   const [locationText, setLocationText] = useState(defaultLocationText);
   const [notesText, setNotesText] = useState(defaultNotesText);
+  const [entries, setEntries] = useState([]);
   const [day, setDay] = useState(() =>
     dayjs(todaysDateString)
   );
   const navigate = useNavigate();
+
+  const getEntries = useCallback(() => {
+    const run = async () => {
+      const client = user.mongoClient("mongodb-atlas");
+      const collection = client.db("user_data").collection("calendar_entries");
+      const calendarEntries = await collection.find({"userDataID": memberID.toString()});
+      setEntries(calendarEntries.map((entry) => dayjs(entry.date).toString()));
+    }
+    run();
+  }, [user, memberID]);
 
   useEffect(() => {
     const client = user.mongoClient("mongodb-atlas");
@@ -51,7 +62,8 @@ export default function Member() {
     }
     getMember();
     getTasks();
-  }, [memberID, user]);
+    getEntries();
+  }, [memberID, user, getEntries]);
 
   // This function is called when the user clicks the "Logout" button.
   const logOut = async () => {
@@ -96,8 +108,31 @@ export default function Member() {
         const entry = await collection.findOne({"userDataID": memberID.toString(), "date": date});
         if(entry) await collection.updateOne({"userDataID": memberID.toString(), "date": date}, { $set : {"location": locationText, "notes": notesText}});
         else await collection.insertOne({"userDataID": memberID.toString(), "date": date, "location": locationText, "notes": notesText});
+        getEntries();
         alert("Saved!");
       }
+    } catch(error) {
+      alert(error);
+    }
+  }
+
+  const deleteEntry = async () => {
+    const date = new Date("<" + String(day.$y) + "-" + 
+    String(day.$M + 1).padStart(2, "0") + "-" + String(day.$D).padStart(2, "0") + ">");
+    try {
+      const client = user.mongoClient("mongodb-atlas");
+      const collection = client.db("user_data").collection("calendar_entries");
+      const entry = await collection.findOne({"userDataID": memberID.toString(), "date": date});
+      console.log(entry);
+      if(!entry) 
+        alert("There is not a saved entry to delete.");
+      else {
+        await collection.deleteOne({"userDataID": memberID.toString(), "date": date});
+        setLocationText(defaultLocationText);
+        setNotesText(defaultNotesText);
+        getEntries();
+        alert("Deleted!");
+      }     
     } catch(error) {
       alert(error);
     }
@@ -142,20 +177,21 @@ export default function Member() {
     { field: "task", headerName: "Task", width: 500},
     { field: "description", headerName: "Description", width: 5000}
   ];
-  const boolean = true;
+
   const renderPickerDay = (date, selectedDates, pickersDayProps) => {
-    console.log(date);
     return (
       <PickersDay
         {...pickersDayProps}
-        sx={boolean ? { 
+        sx={entries.includes(date.toString()) 
+            && !(selectedDates.map((date) => date.toString()).includes(date.toString())) ? { 
           [`&&.${pickersDayClasses.root}`]: {
-            
+            backgroundColor: "pink"
           } 
         } : {}}
       />
     );
   }
+
   return (
     <>
         <TopBanner name = {memberName} id = {user.customData.companyID.$numberInt}/>
@@ -195,7 +231,10 @@ export default function Member() {
                 onChange={ev => setNotesText(ev.target.value)}
                 style={{width: "100%", height: 200 }}
               />
-              <Button variant="contained" onClick={saveEntry}>Save</Button>
+              <Stack direction="row" style={{ width:"100%" }} spacing={1}>
+                <Button variant="contained" onClick={saveEntry}>Save Entry</Button>
+                <Button variant="contained" color="error" onClick={deleteEntry}>Delete Entry</Button>
+              </Stack>
             </Stack>
           </Box>
         </h1>
