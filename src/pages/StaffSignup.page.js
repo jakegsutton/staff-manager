@@ -42,6 +42,7 @@ const StaffSignup = () => {
         const user = await emailPasswordSignup(form.email, form.password);
         if (user) {
           collection.insertOne({ userID: user.id, userName: form.userName, companyID: +form.companyID, isManager: false, teamID: ""});
+          user.refreshCustomData();
           redirectNow();
         }
       }

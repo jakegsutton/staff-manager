@@ -12,6 +12,7 @@ import CreateTeam from "./pages/CreateTeam.page";
 import Team from "./pages/Team.page";
 import Member from "./pages/Member.page";
 import CreateTask from "./pages/CreateTask.page";
+import AddMembers from "./pages/AddMembers.page";
 
 
 function App() {
@@ -43,6 +44,9 @@ function App() {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route exact path="/create-task" element={<CreateTask />} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route exact path="/add-members" element={<AddMembers />} />
           </Route>
         </Routes>
       </UserProvider>

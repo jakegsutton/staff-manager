@@ -8,6 +8,7 @@ export class TopBanner extends Component {
 
   render() {
     const displayCompanyInfo = this.props.name && this.props.id;
+    const hasTeam = this.props.team;
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -16,7 +17,7 @@ export class TopBanner extends Component {
                       Staff Manager
                     </Typography>
                     <Typography variant="h6" component="div">
-                      {this.props.name} {displayCompanyInfo ? '|' : ''} {this.props.id}
+                      {this.props.name} {displayCompanyInfo ? '|' : ''} {this.props.id} {hasTeam ? '|' : ''} {this.props.team}
                     </Typography>
                 </Toolbar>
             </AppBar>

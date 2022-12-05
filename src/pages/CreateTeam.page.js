@@ -86,7 +86,7 @@ export default function CreateTeam() {
 
   return (
     <>
-      <TopBanner/>
+      <TopBanner name = {user.customData.companyName} id = {user.customData.companyID.$numberInt}/>
       <form
         style={{
           display: "flex",

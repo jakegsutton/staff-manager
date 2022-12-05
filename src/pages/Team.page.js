@@ -76,6 +76,10 @@ export default function Team() {
     }
   }
 
+  const addMembers = () => {
+    navigate("/add-members");
+  }
+
   const selectionChangeEvent = (params) => {
     setSelected(params);
   }
@@ -121,6 +125,7 @@ export default function Team() {
         <h1>
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" onClick={back}>Back</Button>
+                <Button variant="contained" onClick={addMembers}>Add Members</Button>
                 <Button variant="contained" color="error" onClick={removeMembers}>Remove Selected Members</Button>
                 <Button variant="contained" onClick={logOut}>Logout</Button>
             </Stack>
