@@ -113,6 +113,11 @@ export default function Team() {
         </h1>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
+            sx={{
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "skyblue"
+              }
+            }}
             rows={members}
             columns={columns}
             pageSize={5}

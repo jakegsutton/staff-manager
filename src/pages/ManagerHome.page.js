@@ -83,6 +83,11 @@ export default function ManagerHome() {
         </h1>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
+            sx={{
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "skyblue"
+              }
+            }}
             rows={teams}
             columns={columns}
             pageSize={5}

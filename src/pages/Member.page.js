@@ -7,7 +7,6 @@ import Stack from '@mui/material/Stack';
 import Typography from "@mui/material/Typography";
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
-import { darken } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -250,13 +249,15 @@ export default function Member() {
                 width: '100%',
                 '& .Completed': {
                     bgcolor: (theme) => theme.palette.success.light,
-                    '&:hover': {
-                        bgcolor: (theme) => darken(theme.palette.success.light, .1)
-                    },
                 },
                 }}
             >
                 <DataGrid
+                    sx={{
+                      "& .MuiDataGrid-row:hover": {
+                        backgroundColor: "skyblue"
+                      }
+                    }}
                     rows={tasks}
                     columns={columns}
                     pageSize={5}

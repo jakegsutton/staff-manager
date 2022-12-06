@@ -6,7 +6,6 @@ import Typography from "@mui/material/Typography";
 import { ObjectId } from "bson";
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
-import { darken } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -243,19 +242,21 @@ export default function StaffHome() {
             </Typography>
         </h1>
         <div style={{ height: 400, width: '100%' }}>
-            <Box
+              <Box
                 sx={{
                 height: 400,
                 width: '100%',
                 '& .Completed': {
                     bgcolor: (theme) => theme.palette.success.light,
-                    '&:hover': {
-                        bgcolor: (theme) => darken(theme.palette.success.light, .1)
-                    },
                 },
                 }}
-            >
+              >
                 <DataGrid
+                    sx={{
+                      "& .MuiDataGrid-row:hover": {
+                        backgroundColor: "skyblue"
+                      }
+                    }}
                     rows={tasks}
                     columns={columns}
                     pageSize={5}
