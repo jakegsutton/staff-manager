@@ -52,7 +52,7 @@ export default function Team() {
     try {
       const loggedOut = await logOutUser();
       if (loggedOut) {
-        window.location.reload(true);
+        navigate("/login");
       }
     } catch (error) {
       alert(error)

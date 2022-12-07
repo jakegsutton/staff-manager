@@ -13,6 +13,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { PickersDay, pickersDayClasses } from '@mui/x-date-pickers/PickersDay';
+import { useNavigate } from 'react-router-dom';
 
 const today = new Date();
 const todaysDateString = String(today.getFullYear()) + "-" + 
@@ -21,6 +22,7 @@ const defaultLocationText = "No location entry for this date.";
 const defaultNotesText = "No notes entry for this date.";
 
 export default function StaffHome() {
+  const navigate = useNavigate();
   const { logOutUser, user } = useContext(UserContext);
   const [teamName, setTeamName] = useState("");
   const [selected, setSelected] = useState([]);
@@ -61,7 +63,8 @@ export default function StaffHome() {
       const team = await collection.findOne({"_id" : ObjectId(user.customData.teamID)});
       setTeamName(team.name);
     }
-    getTeam();
+    if(user.customData.teamID)
+      getTeam();
     getTasks();
     getEntries();
   }, [user, getTasks, getEntries]);
@@ -74,7 +77,7 @@ export default function StaffHome() {
       // Now we will refresh the page, and the user will be logged out and
       // redirected to the login page because of the <PrivateRoute /> component.
       if (loggedOut) {
-        window.location.reload(true);
+        navigate("/login");
       }
     } catch (error) {
       alert(error)

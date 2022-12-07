@@ -34,7 +34,7 @@ export default function CreateTask() {
       // Now we will refresh the page, and the user will be logged out and
       // redirected to the login page because of the <PrivateRoute /> component.
       if (loggedOut) {
-        window.location.reload(true);
+        navigate("/login");
       }
     } catch (error) {
       alert(error)
