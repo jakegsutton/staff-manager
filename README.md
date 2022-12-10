@@ -4,4 +4,8 @@ Manager Web App Intended for Staffing Companies.
 
 Setup:
 
-In the project directory run 'npm install' to download dependencies and run 'npm start' to launch a local instance. 
+In the project directory run 'npm install' to download dependencies and run 'npm start' to launch a local instance.
+
+Website:
+
+staff-manager-taalo.mongodbstitch.com
